@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "./components/header";
 import { Card } from "./components/card";
 import { Carrito } from "./components/carrito";
@@ -57,6 +57,43 @@ const App = () => {
   const eliminarDelCarrito = (index) => {
       setCarrito(prev => prev.filter((_, i) => i !== index));
   };
+
+  const [productos, setProductos] = useState([]);
+
+//   useEffect(() => {
+//     const getProductos = async () => {
+//     try {
+//       // const response = await fetch("https://dummyjson.com/products?limit=40", {
+//       const response = await fetch("https://dummyjson.com/products/category/mens-shoes?limit=40", {method: "GET", });
+//       const data = await response.json();
+//       console.log(data.products); // Solo para depurar
+//       setProductos(data.products); // Guardamos los productos
+//     } catch (error) {
+//       console.error("Error al cargar productos:", error);
+//     }
+//   };
+//   getProductos();
+// }, []);
+
+  useEffect(() => {
+    const getProductos = async () => {
+    try {
+      const respHombre  = await fetch("https://dummyjson.com/products/category/mens-shoes?limit=40", {method: "GET", });
+      const respMujer  = await fetch("https://dummyjson.com/products/category/womens-shoes?limit=40", {method: "GET", });
+
+      const dataHombre = await respHombre.json();
+      const dataMujer = await respMujer.json();
+      
+      const todosLosZapatos = [...dataHombre.products, ...dataMujer.products];
+      setProductos(todosLosZapatos);
+      console.log(todosLosZapatos); 
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+    }
+  };
+  getProductos();
+}, []);
+
   return (
     <Contenedor_general>
       <Header carrito={carrito} mostrarCarrito={mostrarCarrito} setMostrarCarrito={setMostrarCarrito}/>
@@ -66,9 +103,9 @@ const App = () => {
             <Card 
               key={index}
               className="Card"
-              imagen={producto.imagen}
-              titulo={producto.titulo}
-              precio={producto.precio}
+              imagen={producto.images[0]}
+              titulo={producto.title}
+              precio={producto.price}
               setCarrito={setCarrito}
             />
           ))}
